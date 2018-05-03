@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="main-window h-x-app">
+  <div class="window-title">
+    <h3 class="window-name p-name u-url">DummyAuth</h3>
+  </div>
+  <div class="window-content">
+    <div class="window-left-margin">
+      <img class="u-icon" alt="DummyAuth icon." src="{{ url_for('static', filename='error.png') }}">
+    </div>
+    <div class="window-text">
+      <p>
+        There was an error during the login process.
+      </p>
+
+      {% if error == 'validation_error' %}
+      <p>
+        The passcode received from your authorization provider could not be
+        validated. This either means that your authorization provider returned
+        an invalid token, or that the validation process refuses to accept
+        the given token.
+      </p>
+
+      <p>
+        The validation failed with the following error: {{ message }}.
+      </p>
+      {% elif error == 'exception' %}
+      <p>
+        The application failed to fulfill your request because of an error.
+        The error was: {{ message }}.
+      </p>
+      {% endif %}
+
+      <form method="POST" action="{{ url_for('logout') }}">
+        <div class="">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          <button class="form-button" type="submit">Continue</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

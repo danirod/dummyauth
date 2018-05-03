@@ -14,6 +14,57 @@ Requirements
 **In this house we use pipenv**.
 
 
+How to run
+----------
+
+### Environment variables
+
+Flask will read the environment variables from an .env file if such file
+exists in the project root directory. This is handy during development.
+Alternatively, use your shell to export environment variables, set them
+when creating the Docker container, or use any other way to pass environment
+variables to the application.
+
+Environment variables:
+
+* SECRET_KEY: the key to use to encrypt sessions. Please, set up a key.
+* FLASK_ENV: the environment to use: "production" or "development".
+* FLASK_DEBUG: whether to enable debug (FLASK_DEBUG=1) or not (FLASK_DEBUG=0).
+* HOST: host to bind the application on. By default, it will bind the server
+  to 0.0.0.0, listening on all interfaces, unless changed to something better
+  (i.e. HOST="127.0.0.1" or HOST="192.168.1.33").
+
+
+### Internal Flask server
+
+* Install pipenv if you don't have it: `pip install pipenv` or use your
+  system package manager (use the PPA, `brew install pipenv` on MacOS X...)
+* `pipenv install` to install dependencies.
+* `pipenv run flask run` to run the internal Flask server.
+
+
+### WSGI, Gunicorn
+
+**Under development**.
+
+
+### Docker
+
+You can build the Dockerfile included in this project and run the server using
+Docker. When running inside the Docker container, the following environment
+variables are set by default:
+
+* FLASK_ENV: `production`, unless changed.
+* FLASK_DEBUG: `0`, unless changed.
+
+An usage example:
+
+    $ docker build -t danirod/dummyauth:1.0 .
+    $ docker run --rm -p 127.0.0.1:5000:5000 \
+      -e SECRET_KEY="can you keep a secret?" \
+      danirod/dummyauth:1.0
+
+
 Current caveats
 ---------------
 

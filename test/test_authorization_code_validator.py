@@ -8,6 +8,7 @@ class AuthorizationCodeValidatorTestCase(TestCase):
     @httpretty.httprettified
     def test_spider_handles_valid_requests(self):
         httpretty.register_uri(httpretty.POST, 'http://auth.example.com/login',
+                               adding_headers={'content-type': 'application/json'},
                                body='{"me": "http://johndoe.example.com/"}')
         validator_params={
             'authorization_endpoint': 'http://auth.example.com/login',
@@ -21,6 +22,7 @@ class AuthorizationCodeValidatorTestCase(TestCase):
     @httpretty.httprettified
     def test_spider_handles_valid_profile_url(self):
         httpretty.register_uri(httpretty.POST, 'http://auth.example.com/login',
+                               adding_headers={'content-type': 'application/json'},
                                body='{"me": "http://johndoe.example.com/"}')
         validator_params={
             'authorization_endpoint': 'http://auth.example.com/login',
@@ -34,6 +36,7 @@ class AuthorizationCodeValidatorTestCase(TestCase):
     @httpretty.httprettified
     def test_spider_handles_invalid_requests(self):
         httpretty.register_uri(httpretty.POST, 'http://auth.example.com/login',
+                               adding_headers={'content-type': 'application/json'},
                                body='{"error": "invalid_request"}',
                                status=400)
         validator_params={
@@ -48,6 +51,7 @@ class AuthorizationCodeValidatorTestCase(TestCase):
     @httpretty.httprettified
     def test_spider_handles_invalid_request_code(self):
         httpretty.register_uri(httpretty.POST, 'http://auth.example.com/login',
+                               adding_headers={'content-type': 'application/json'},
                                body='{"error": "invalid_request"}',
                                status=400)
         validator_params={
@@ -62,6 +66,7 @@ class AuthorizationCodeValidatorTestCase(TestCase):
     @httpretty.httprettified
     def test_spider_sends_appropiate_request(self):
         httpretty.register_uri(httpretty.POST, 'http://auth.example.com/login',
+                               adding_headers={'content-type': 'application/json'},
                                body='{"me": "http://johndoe.example.com/"}')
         validator_params={
             'authorization_endpoint': 'http://auth.example.com/login',
@@ -75,6 +80,7 @@ class AuthorizationCodeValidatorTestCase(TestCase):
     @httpretty.httprettified
     def test_spider_sends_appropiate_code(self):
         httpretty.register_uri(httpretty.POST, 'http://auth.example.com/login',
+                               adding_headers={'content-type': 'application/json'},
                                body='{"me": "http://johndoe.example.com/"}')
         validator_params={
             'authorization_endpoint': 'http://auth.example.com/login',
@@ -89,6 +95,7 @@ class AuthorizationCodeValidatorTestCase(TestCase):
     @httpretty.httprettified
     def test_spider_sends_appropiate_client_id(self):
         httpretty.register_uri(httpretty.POST, 'http://auth.example.com/login',
+                               adding_headers={'content-type': 'application/json'},
                                body='{"me": "http://johndoe.example.com/"}')
         validator_params={
             'authorization_endpoint': 'http://auth.example.com/login',
@@ -103,6 +110,7 @@ class AuthorizationCodeValidatorTestCase(TestCase):
     @httpretty.httprettified
     def test_spider_sends_appropiate_redirect_uri(self):
         httpretty.register_uri(httpretty.POST, 'http://auth.example.com/login',
+                               adding_headers={'content-type': 'application/json'},
                                body='{"me": "http://johndoe.example.com/"}')
         validator_params={
             'authorization_endpoint': 'http://auth.example.com/login',

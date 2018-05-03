@@ -9,60 +9,70 @@ process of other IndieWeb applications.
 Requirements
 ------------
 
-* Python 3.6 + pipenv
-
-**In this house we use pipenv**.
+* Python 3.6. (May work on Python 3.5, but it hasn't been tested)
+* **In this house we use pipenv**. Get it using `pip install pipenv`.
 
 
 How to run
 ----------
 
-### Environment variables
+### Development mode
 
-Flask will read the environment variables from an .env file if such file
-exists in the project root directory. This is handy during development.
-Alternatively, use your shell to export environment variables, set them
-when creating the Docker container, or use any other way to pass environment
-variables to the application.
+This application uses the Flask application pattern factory, so importing
+the `dummyauth` module will expose a `create_app` function. There is also an
+uwsgi.py that exposes an app object.
 
-Environment variables:
+During development mode you'll probably use Flask internal development server.
+This server is designed to be used during development and it's not suitable
+for the safety and performance standards used in production environments.
+However, it's easy to use and it can be used in development mode.
 
-* SECRET_KEY: the key to use to encrypt sessions. Please, set up a key.
-* FLASK_ENV: the environment to use: "production" or "development".
-* FLASK_DEBUG: whether to enable debug (FLASK_DEBUG=1) or not (FLASK_DEBUG=0).
-* HOST: host to bind the application on. By default, it will bind the server
-  to 0.0.0.0, listening on all interfaces, unless changed to something better
-  (i.e. HOST="127.0.0.1" or HOST="192.168.1.33").
+Make sure you've installed Pipfile dependencies using:
+
+    pipenv install
+
+Run the server using:
+
+    pipenv run flask run
+
+**Note that the server won't run unless a secret key is set**. (See below).
+
+**Environment variables**: If an .env file is found in the project root
+directory, those variables will be read and used in the Flask server. There
+are a few useful environment variables.
+
+* SECRET_KEY: The key to use to encrypt session. Please, use a key.
+* FLASK_ENV: The environment to run the server in: production, development...
+* FLASK_DEBUG: Whether to enable debug (FLASK_DEBUG=1) or not (FLASK_DEBUG=0).
 
 
-### Internal Flask server
+### WSGI application server
 
-* Install pipenv if you don't have it: `pip install pipenv` or use your
-  system package manager (use the PPA, `brew install pipenv` on MacOS X...)
-* `pipenv install` to install dependencies.
-* `pipenv run flask run` to run the internal Flask server.
+The WSGI server increases the performance of the Flask application and it's
+what you should use to run your application in a production server. You're
+encouraged to still put a web server on top of your application server and
+to reverse proxy requests to your application server, such as using NGINX or
+Apache.
+
+Suggested application servers are uWSGI and Gunicorn. None of them are in the
+Pipfile. It may be tricky to get the application servers use the PYTHONPATH
+of Pipfile.
+
+More instructions on how to use uWSGI and Gunicorn have to be written.
 
 
-### WSGI, Gunicorn
-
-**Under development**.
-
-
-### Docker
+### Docker images
 
 You can build the Dockerfile included in this project and run the server using
-Docker. When running inside the Docker container, the following environment
-variables are set by default:
+Docker. The Docker image will use the uWSGI application server and expose it
+in port 5000. You may want to put this port behind a reverse proxy web server
+such as NGINX.
 
-* FLASK_ENV: `production`, unless changed.
-* FLASK_DEBUG: `0`, unless changed.
+You still have to set the secret key using the SECRET_KEY environment variable.
+A full example on how to build and deploy this image using Docker:
 
-An usage example:
-
-    $ docker build -t danirod/dummyauth:1.0 .
-    $ docker run --rm -p 127.0.0.1:5000:5000 \
-      -e SECRET_KEY="can you keep a secret?" \
-      danirod/dummyauth:1.0
+    $ docker build -t dummyauth:1.0 .
+    $ docker run --rm -p 5000:5000 -e SECRET_KEY="s3cr3t" dummyauth:1.0
 
 
 Current caveats

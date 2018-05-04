@@ -103,17 +103,3 @@ to your homepage.
 As a further experiment, if the validator doesn't find an authorization_endpoint
 but finds rel="me" links, it should take you to IndieLogin.com to authenticate
 yourself using one of your social identities (Twitter, GitHub...)
-
-
-### May accept invalid profile URLs
-
-At the moment Dummy Auth does not validate an URL against the rules defined
-in Section 3.1 of the IndieAuth spec. For instance, URLs that have a port
-component or a fragment component.
-
-
-### Does not accept a hostname
-
-It would be easier if you could just use `example.com` and let the system
-add http: or https:. At the moment you have to type `http://example.com/` or
-the validation will fail.

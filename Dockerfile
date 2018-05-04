@@ -29,4 +29,4 @@ COPY . /app
 
 # Run the server using uWSGI.
 EXPOSE 5000
-ENTRYPOINT ["uwsgi", "-s", ":5000", "--protocol", "http", "--master", "--plugin", "python", "--mount", "/=wsgi:app"]
+CMD ["uwsgi", "-s", ":5000", "--protocol", "http", "--master", "--plugin", "python", "--mount", "/=wsgi:app"]

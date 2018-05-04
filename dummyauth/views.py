@@ -27,7 +27,7 @@ def login_view():
         # An authorization endpoint was found. Prepare the request.
         request_payload = {
             'me': spider.canonical_url,
-            'client_id': 'http://nonexistant.dev',
+            'client_id': url_for('login', _external=True),
             'redirect_uri': url_for('callback', _external=True),
             'state': int(time.time()),
             'response_type': 'id'
@@ -60,7 +60,7 @@ def login_callback():
     validator_params = {
         'authorization_endpoint': session['login.endpoint'],
         'code': request.args['code'],
-        'client_id': 'http://nonexistant.dev',
+        'client_id': url_for('login', _external=True),
         'redirect_uri': url_for('callback', _external=True)
     }
     validator = AuthorizationCodeValidator(**validator_params)

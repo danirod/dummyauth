@@ -6,8 +6,13 @@ import os
 csrf = CSRFProtect()
 
 def create_app():
+    configs = {
+        'production': 'dummyauth.config.BaseConfig',
+        'development': 'dummyauth.config.DevelopmentConfig',
+        'testing': 'dummyauth.config.TestingConfig',
+    }
     app = Flask(__name__)
-    app.secret_key = os.environ['SECRET_KEY']
+    app.config.from_object(configs.get(app.env, configs['production']))
     csrf.init_app(app)
 
     app.add_url_rule('/', 'login', views.login_view, methods=['GET', 'POST'])

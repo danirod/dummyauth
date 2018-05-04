@@ -1,3 +1,4 @@
 .env
+*.egg-info
 *.py[co]
 .pytest_cache/

@@ -31,11 +31,25 @@ Make sure you've installed Pipfile dependencies using:
 
     pipenv install
 
-Run the server using:
+Because of how Python works, the dummyauth package needs to be in your
+PYTHONPATH. Either add the project root to your PYTHONPATH, or simply install
+this package in development mode:
 
-    pipenv run flask run
+    pipenv shell
+    pip install -e .
 
-**Note that the server won't run unless a secret key is set**. (See below).
+Then you can proceed to run the application:
+
+    flask run
+
+The application will run in production mode by default. You may want to change
+to development mode during development in order to have things such as
+reloading or a predefined secret key.
+
+    FLASK_ENV=development flask run
+
+**No secret key has been set by default in production mode**. See below for
+more information on how to set a secret key using environment variables.
 
 **Environment variables**: If an .env file is found in the project root
 directory, those variables will be read and used in the Flask server. There
@@ -55,10 +69,12 @@ to reverse proxy requests to your application server, such as using NGINX or
 Apache.
 
 Suggested application servers are uWSGI and Gunicorn. None of them are in the
-Pipfile. It may be tricky to get the application servers use the PYTHONPATH
-of Pipfile.
+Pipfile.
 
-More instructions on how to use uWSGI and Gunicorn have to be written.
+In both cases, you can use `wsgi:app` as the module to load inside your WSGI
+server. This is an application instance ready to be used by your WSGI server.
+Depending on which server you choose, you'll have to pass this module using
+a different method.
 
 
 ### Docker images

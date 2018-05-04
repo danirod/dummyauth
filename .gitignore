@@ -1,4 +1,11 @@
 .env
-*.egg-info
+
+# Python
 *.py[co]
+
+# pip
+*.egg-info
+
+# Pytest stuff
+.cache/
 .pytest_cache/

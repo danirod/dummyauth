@@ -1,5 +1,8 @@
 .gitignore
 .pytest_cache
+.cache
 *.egg-info
 .vscode
 .env
+*.pyc
+*.pyo

@@ -23,8 +23,7 @@
             <div class="form-field">
               {{ form.domain(class_='form-input') }}
               {% if form.domain.errors %}
-              <br>
-              <span class="form-error">{{ '<br>'.join(form.domain.errors) }}</span>
+              <br><span class="form-error">{{ form.domain.errors[0] }}.</span>
               {% endif %}
             </div>
           </div>

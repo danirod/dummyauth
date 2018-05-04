@@ -5,6 +5,33 @@ from urllib.parse import urlsplit, urlunsplit
 from ipaddress import ip_address
 
 
+class CanonicalFilter(object):
+    """
+    This object behaves as a callable. The callable receives the data that
+    the user has supposedly written in the URL.
+    """
+
+    def __call__(self, value):
+        url_components = urlsplit(value)
+
+        # Convert the netloc to lowercase.
+        components_list = list(url_components)
+        components_list[1] = url_components.netloc.lower()
+        value = urlunsplit(components_list)
+
+        # If a scheme is missing, set the scheme to http.
+        if not url_components.scheme:
+            value = 'http://' + value
+            url_components = urlsplit(value)
+
+        # If a path is missing, append an empty slash.
+        if not url_components.path:
+            value += '/'
+            url_components = urlsplit(value)
+
+        return value
+
+
 class ValidUserProfile(object):
     """
     This validator tests for additional rules that a valid profile URL must
@@ -59,4 +86,4 @@ class LoginForm(FlaskForm):
         DataRequired('Please, input a domain name to log in'),
         URL(message='Please, use a valid URL'),
         ValidUserProfile(message='Please, use a valid URL'),
-    ])
+    ], filters=[CanonicalFilter()])

@@ -125,6 +125,7 @@ class EndpointDiscoverySpider(object):
         self.__target_url = None
         self.__authorization_endpoint = None
         self.__token_endpoint = None
+        self.__has_relme = False
         self.__fetched = False
 
     @property
@@ -160,6 +161,12 @@ class EndpointDiscoverySpider(object):
             self.__fetch()
         return self.__token_endpoint
 
+    def supports_relmeauth(self) -> bool:
+        """ Returns true if this site has rel="me" links. """
+        if not self.__fetched:
+            self.__fetch()
+        return self.__has_relme
+
     def __fetch(self):
         """ Discover the endpoints for this URL. """
         fields = self.__discover(self.__discovery_url, self.__redirect_limit)
@@ -167,6 +174,7 @@ class EndpointDiscoverySpider(object):
         self.__target_url = fields['discovery_url']
         self.__authorization_endpoint = fields['authorization_endpoint']
         self.__token_endpoint = fields['token_endpoint']
+        self.__has_relme = fields['relme']
         self.__fetched = True
 
     @classmethod
@@ -197,7 +205,8 @@ class EndpointDiscoverySpider(object):
             'canonical_url': discovery_url,
             'discovery_url': discovery_url,
             'authorization_endpoint': None,
-            'token_endpoint': None
+            'token_endpoint': None,
+            'relme': False
         }
 
         # Find for a valid authorization_endpoint in the URL.
@@ -239,5 +248,10 @@ class EndpointDiscoverySpider(object):
             if tag and not data['token_endpoint']:
                 endpoint = urljoin(discovery_url, tag['href'])
                 data['token_endpoint'] = endpoint
+
+            # Seek for additional rel="me" links.
+            tag = soup.find('link', rel='me')
+            if tag:
+                data['relme'] = True
 
         return data

@@ -129,6 +129,38 @@ class EndpointDiscoverySpiderTestCase(TestCase):
         auth_endpoint.should.equal('http://auth.example.com/')
 
     @httpretty.httprettified
+    def test_spider_parses_relme_as_fallback(self):
+        httpretty.register_uri(httpretty.HEAD, 'http://example.com/johndoe/')
+        httpretty.register_uri(httpretty.GET, 'http://example.com/johndoe/',
+                               body="""<!DOCTYPE html>
+        <html>
+            <head>
+                <title>John Doe Website</title>
+                <link rel="me" href="https://twitter.com/danirod93">
+                <link rel="me" href="https://github.com/danirod">
+            </head>
+        </html>
+        """)
+
+        spider = EndpointDiscoverySpider('http://example.com/johndoe/')
+        spider.supports_relmeauth().should.equal(True)
+
+    @httpretty.httprettified
+    def test_spider_counts_no_relme_links_as_no_relmeauth(self):
+        httpretty.register_uri(httpretty.HEAD, 'http://example.com/johndoe/')
+        httpretty.register_uri(httpretty.GET, 'http://example.com/johndoe/',
+                               body="""<!DOCTYPE html>
+        <html>
+            <head>
+                <title>John Doe Website</title>
+            </head>
+        </html>
+        """)
+
+        spider = EndpointDiscoverySpider('http://example.com/johndoe/')
+        spider.supports_relmeauth().should.equal(False)
+
+    @httpretty.httprettified
     def test_spider_follows_temporally_redirects(self):
         old_headers = {'Location': 'http://new.example.com'}
         httpretty.register_uri(httpretty.HEAD, 'http://old.example.com',

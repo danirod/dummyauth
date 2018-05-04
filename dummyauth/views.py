@@ -1,5 +1,5 @@
 import time
-from flask import flash, redirect, render_template, request, session, url_for
+from flask import redirect, render_template, request, session, url_for
 from flask.views import View
 from dummyauth import exceptions
 from dummyauth.forms import LoginForm
@@ -20,8 +20,16 @@ def login_view():
     if request.method == 'POST' and form.validate():
         # Fetch the authorization endpoint for this user.
         spider = EndpointDiscoverySpider(form.domain.data)
-        if not spider.authorization_endpoint:
-            form.domain.errors.append('No authorization endpoint found')
+        if spider.authorization_endpoint:
+            # The site has declared an explicit authorization endpoint.
+            login_endpoint = spider.authorization_endpoint
+        elif spider.supports_relmeauth():
+            # The site has not declared an authorization endpoint but has
+            # rel="me" links. We can let a third party authorization provider
+            # handle the login process.
+            login_endpoint = 'https://indieauth.com/auth'
+        else:
+            form.domain.errors.append('No authorization links found here')
             return render_template('welcome.html', form=form)
 
         # An authorization endpoint was found. Prepare the request.
@@ -34,11 +42,11 @@ def login_view():
         }
 
         # Some data will have to be verified later on. Save using session.
-        session['login.endpoint'] = spider.authorization_endpoint
+        session['login.endpoint'] = login_endpoint
         session['login.state'] = request_payload['state']
 
         # Build the login URL and send the user there.
-        login_url = __update_qs(spider.authorization_endpoint, request_payload)
+        login_url = __update_qs(login_endpoint, request_payload)
         return redirect(login_url), 302
 
     # Catch-all when nothing of the above worked.

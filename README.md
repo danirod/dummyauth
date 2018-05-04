@@ -89,17 +89,3 @@ A full example on how to build and deploy this image using Docker:
 
     $ docker build -t dummyauth:1.0 .
     $ docker run --rm -p 5000:5000 -e SECRET_KEY="s3cr3t" dummyauth:1.0
-
-
-Current caveats
----------------
-
-### No RelMeAuth support
-
-Even if your homepage has rel="me" links for every social network ever created,
-you won't be able to login unless you add a rel="authorization_endpoint" link
-to your homepage.
-
-As a further experiment, if the validator doesn't find an authorization_endpoint
-but finds rel="me" links, it should take you to IndieLogin.com to authenticate
-yourself using one of your social identities (Twitter, GitHub...)

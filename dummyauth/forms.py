@@ -12,6 +12,9 @@ class CanonicalFilter(object):
     """
 
     def __call__(self, value):
+        # If the form is empty, give up.
+        if not value: return ''
+
         url_components = urlsplit(value)
 
         # Convert the netloc to lowercase.

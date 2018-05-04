@@ -1,4 +1,5 @@
 import requests
+from dummyauth.exceptions import InvalidAuthorizationResponseException
 from urllib.parse import parse_qs, urljoin
 from bs4 import BeautifulSoup
 
@@ -25,7 +26,8 @@ class AuthorizationCodeValidator(object):
             qs = parse_qs(request.text)
             return {k: qs[k][0] for k in qs }
         else:
-            raise ValueError('Unsupported content-type: %s' % content_type)
+            message = 'Unsupported content-type: {}'.format(content_type)
+            raise InvalidAuthorizationResponseException(message)
 
     def __fetch(self):
         """ Perform validation. """

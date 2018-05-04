@@ -1,6 +1,7 @@
 import time
 from flask import flash, redirect, render_template, request, session, url_for
 from flask.views import View
+from dummyauth import exceptions
 from dummyauth.forms import LoginForm
 from dummyauth.spider import AuthorizationCodeValidator, EndpointDiscoverySpider
 from urllib.parse import parse_qs, urlencode, urlsplit, urlunsplit
@@ -47,11 +48,13 @@ def login_callback():
     """ Called as a callback after login, validates the received code. """
     for session_param in ('login.endpoint', 'login.state'):
         if session_param not in session:
-            raise ValueError('Missing session key: %s' % session_param)
+            error = 'Missing session key: {}'.format(session_param)
+            raise exceptions.InvalidParameterException(error)
 
     # DummyAuth provided an state paramater. Validate it's correct.
     if int(request.args['state']) != session['login.state']:
-        raise ValueError('The given CSRF state mismatches the given state.')
+        error = 'The given CSRF state mismatches the sent CSRF state.'
+        raise exceptions.InvalidAuthorizationResponseException(error)
 
     # Build a validator using the required parameters.
     validator_params = {
@@ -73,12 +76,16 @@ def login_callback():
         session['login.message'] = validator.error
         return redirect(url_for('failure')), 302
 
-def handle_error_response(error=None, message=None):
+def handle_error_response(exception: exceptions.DummyAuthException=None):
     """ Handles an error response. """
-    params = {'error': session.get('login.error', 'generic_error')}
-    if params['error'] == 'validation_error':
-        params['message'] = session.get('login.message')
-    return render_template('failure.html', **params)
+    if exception:
+        error = 'exception'
+        message = exception.message
+    else:
+        error = session.get('login.error', 'generic_error')
+        if error == 'validation_error':
+            message = session.get('login.message')
+    return render_template('failure.html', errror=error, message=message)
 
 def display_profile():
     """ If the user is logged in, it will display the profile URL. """
